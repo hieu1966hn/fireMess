@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FireMess</title>
+    <link rel="shortcut icon" href="https://i.imgur.com/vdvkwnm.png" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/emojionearea/3.4.2/emojionearea.min.css" integrity="sha512-vEia6TQGr3FqC6h55/NdU3QSM5XR6HSl5fW71QTKrgeER98LIMGwymBVM867C1XHIkYD9nMTfWK2A0xcodKHNA==" crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/account.css" />
+    <link rel="stylesheet" href="./css/landing.css" />
+    <link rel="stylesheet" href="./css/scrollbar.css" />
+    <link rel="stylesheet" href="./css/chat.css" />
+  </head>
+
+  <body>
+    <div id="loading"></div>
+
+    <button class="d-none" type="button" id="openEmailModal" data-bs-toggle="modal" data-bs-target="#emailVerificationModal"></button>
+    <div class="modal fade" id="emailVerificationModal" tabindex="-1" aria-labelledby="emailVerificationModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="emailVerificationModalLabel">Email verification needed</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">Please verify your email</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button onclick="model.resendEmail();" type="button" class="btn btn-primary" data-bs-dismiss="modal">Resend email</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <template id="welcomeScreen">
+      <div class="vh-100 overflow-hidden">
+        <div class="px-3 px-md-5 landing-page">
+          <div class="section pt-3 pt-md-5">
+            <div class="d-flex justify-content-between align-items-center pb-2 pb-md-5">
+              <a href=""><img src="https://i.imgur.com/WZqIKV4.png" alt="" /></a>
+              <div class="d-flex align-items-center">
+                <b onclick="to_register();" style="font-size: 18px; cursor: pointer" class="mx-2 navbar-link">SIGN UP</b>
+                <b onclick="to_signin();" style="font-size: 18px; cursor: pointer" class="mx-2 navbar-link">LOG IN</b>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-7 d-md-block fade-left">
+                <img width="100%" src="https://i.imgur.com/qqQxJQR.png" alt="" />
+              </div>
+              <div class="col-md-5 d-flex flex-column justify-content-around py-5 fade-right" style="height: 300px">
+                <h1 class="mb-4" style="font-size: 45x">The best way to chat with your friends</h1>
+                <div class="d-flex d-md-block justify-content-center">
+                  <button onclick="to_register();" class="btn btn-primary btn-lg mb-4">Get started</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row section pt-5">
+            <div class="col-md-6 offset-md-1 fade-left">
+              <div class="py-5">
+                <h1 style="font-size: 45x">Connect with your friends anywhere through our website</h1>
+              </div>
+            </div>
+            <div class="col-md-5 d-md-block fade-right">
+              <img width="100%" src="https://i.imgur.com/EqqHZiP.png" alt="" />
+            </div>
+          </div>
+
+          <div class="row section pt-5">
+            <div class="col-md-6 d-md-block fade-left">
+              <img width="100%" src="https://i.imgur.com/zIBXuB3.png" alt="" />
+            </div>
+            <div class="col-md-5 offset-md-1 fade-right">
+              <div class="py-5">
+                <h1 class="mb-4" style="font-size: 45x">Your messages will be completely secured</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="signinScreen">
+      <div class="vh-100 vw-100 form-background"></div>
+      <div class="d-flex justify-content-center">
+        <div class="form-container">
+          <div class="d-flex justify-content-center">
+            <img src="https://i.imgur.com/WZqIKV4.png" height="50px" width="auto" alt="" />
+          </div>
+
+          <div>
+            <button class="login-btn" onclick="model.signinWithGoogle()"><img src="https://i.imgur.com/yq4Tp3N.png" width="30px" alt="" /> Log in with Google</button>
+          </div>
+          <div>
+            <button class="login-btn" onclick="model.signinWithFacebook()"><img src="https://i.imgur.com/rtyMt5a.png" width="30px" style="border-radius: 50px" alt="" /> Log in with Facebook</button>
+          </div>
+
+          <hr />
+          <form id="signin-form" class="row g-3 needs-validation" novalidate>
+            <div class="col-md-12">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" required />
+              <div class="invalid-feedback">Please provide a valid email.</div>
+            </div>
+            <div class="col-md-12">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" required />
+              <div class="invalid-feedback">Please input your password</div>
+            </div>
+            <div class="col-md-12">
+              <span onclick="to_register();" class="link-primary">Haven't got any account? Sign up</span>
+            </div>
+            <div class="d-grid gap-2 col-md-12">
+              <button class="btn btn-primary" type="submit">Log in</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </template>
+
+    <template id="registerScreen">
+      <div class="vh-100 vw-100 form-background"></div>
+      <div class="d-flex justify-content-center">
+        <div class="form-container">
+          <div class="d-flex justify-content-center">
+            <img src="https://i.imgur.com/WZqIKV4.png" height="50px" width="auto" alt="" />
+          </div>
+
+          <div>
+            <button class="login-btn" onclick="model.signinWithGoogle()"><img src="https://i.imgur.com/yq4Tp3N.png" width="30px" alt="" /> Log in with Google</button>
+          </div>
+          <div>
+            <button class="login-btn" onclick="model.signinWithFacebook()"><img src="https://i.imgur.com/rtyMt5a.png" width="30px" style="border-radius: 50px" alt="" /> Log in with Facebook</button>
+          </div>
+
+          <hr />
+
+          <form id="register-form" class="row g-3 needs-validation" novalidate oninput="optionalValidation();">
+            <div class="col-md-6">
+              <label for="firstName" class="form-label">First name</label>
+              <input type="text" class="form-control" id="firstName" required />
+              <div class="invalid-feedback">Please enter your first name.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="lastName" class="form-label">Last name</label>
+              <input type="text" class="form-control" id="lastName" required />
+              <div class="invalid-feedback">Please enter your last name.</div>
+            </div>
+            <div class="col-md-12">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" required />
+              <div class="invalid-feedback">Please provide a valid email.</div>
+            </div>
+            <div class="col-md-12">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" required pattern=".{6,18}" />
+              <div class="invalid-feedback">Password must be between 6-18 characters.</div>
+            </div>
+            <div class="col-md-12">
+              <label for="confirmPassword" class="form-label">Confirm password</label>
+              <input type="password" class="form-control" id="confirmPassword" required pattern=".{6,18}" />
+              <div class="invalid-feedback">Passwords do not match.</div>
+            </div>
+            <div class="col-md-12">
+              <span onclick="to_signin();" class="link-primary">Already have an account? Log in</span>
+            </div>
+            <div class="d-grid gap-2 col-md-12">
+              <button class="btn btn-primary" type="submit">Sign up</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </template>
+
+    <template id="chatScreen">
+      <div class="d-flex vw-100">
+        <div class="border-end border-bottom vh-100 p-0 d-flex flex-column" style="flex: 0 1 auto; max-width: 350px;">
+          <div style="flex: 0 1 auto">
+            <div class="p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <a class="navbar-brand d-md-block d-none" href="#">
+                  <img src="https://i.imgur.com/WZqIKV4.png" width="auto" height="35px" alt="" />
+                </a>
+
+                <div class="dropdown">
+                  <a class="dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img class="profile-picture" width="36px" height="36px" style="border-radius: 50px" alt="" />
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li>
+                      <span class="dropdown-item" data-bs-toggle="offcanvas" data-bs-target="#currentUserInfo" aria-controls="currentUserInfo"><i class="fa fa-info-circle"></i> Profile</span>
+                    </li>
+                    <li>
+                      <span onclick="model.signout();" class="dropdown-item"><i class="fa fa-sign-out-alt"></i> Log out</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-1 position-relative px-3 d-md-block d-none">
+              <a href="" class="position-absolute" style="top: 10px; left: 25px">
+                <i style="font-size: 20px" id="search-icon" class="fa fa-search"></i>
+              </a>
+
+              <input type="text" class="form-control form-control-sm mb-3" style="padding-left: 35px" placeholder="Search" />
+            </div>
+          </div>
+
+
+          <div id="people" class="d-flex flex-column border-top special-scrollbar" style="overflow-x: hidden; overflow-y: auto; flex: 1 1 auto"></div>
+
+
+        </div>
+
+
+
+        <div class="vh-100 p-0 d-flex flex-column" style="flex: 1 1 auto" id="right-panel">
+          <div style="flex: 0 1 70px; min-height: 70px" class="border-bottom d-flex align-items-center justify-content-between px-3">
+            <div id="chat-user-info">
+              
+            </div>
+            <span data-bs-toggle="offcanvas" data-bs-target="#chatUserInfo" aria-controls="chatUserInfo" title="Info">
+              <i data-bs-toggle="tooltip" data-bs-placement="bottom" title="Info" class="fa fa-info-circle"></i>
+            </span>
+          </div>
+
+          <div id="main-chat" class="overflow-auto pt-3 special-scrollbar" style="flex: 1 1 auto">
+            
+          </div>
+
+          <div style="flex: 0 1 50px; min-height: 50px" class="d-flex justify-content-evenly align-items-center px-1" id="input-box">
+            <label style="flex: 0 1 40px; cursor: pointer" for="image-browse" class="d-flex justify-content-center">
+              <input id="image-browse" class="d-none" type="file" accept="image/png,image/jpeg" onchange="readImageFile(this, ['image/png', 'image/jpeg'])" />
+              <i class="fa fa-image" data-bs-toggle="tooltip" data-bs-placement="top" title="Send an image"></i>
+            </label>
+            <label style="flex: 0 1 40px; cursor: pointer" for="gif-browse" class="d-flex justify-content-center">
+              <input id="gif-browse" class="d-none" type="file" accept="image/gif" onchange="readImageFile(this, ['image/gif'])" />
+              <svg data-bs-toggle="tooltip" style="outline: none" data-bs-placement="top" title="Send a gif" viewBox="0 0 36 36" height="28px" width="28px"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 11a4 4 0 014-4h8c1.067 0 2.035.417 2.753 1.098.517.491 1.151.902 1.866.902H26a4 4 0 014 4v12a4 4 0 01-4 4h-8a3.986 3.986 0 01-2.752-1.098c-.518-.491-1.152-.902-1.866-.902H10a4 4 0 01-4-4V11zm7.865 4.908a1.948 1.948 0 00-1.321-.456c-.461.02-.918.214-1.295.576-.378.363-.65.873-.754 1.457a2.927 2.927 0 00.209 1.708c.236.52.611.915 1.046 1.14a1.87 1.87 0 001.36.152c.454-.122.88-.419 1.195-.868.098-.14.183-.291.253-.451.068-.154-.052-.316-.22-.316H12.85a.85.85 0 010-1.7h2.8c.47 0 .85.38.85.85a4.53 4.53 0 01-.803 2.593c-.527.75-1.277 1.3-2.144 1.534a3.57 3.57 0 01-2.586-.285c-.8-.414-1.43-1.107-1.811-1.947a4.628 4.628 0 01-.335-2.706 4.357 4.357 0 011.25-2.388 3.697 3.697 0 012.398-1.048 3.647 3.647 0 012.472.838.85.85 0 01-1.076 1.317zM22.7 19.6a.25.25 0 01.25-.25h2.75a.85.85 0 000-1.7h-2.75a.25.25 0 01-.25-.25v-1.45a.25.25 0 01.25-.25h3.2a.85.85 0 100-1.7h-4.3a.85.85 0 00-.85.85v6.3a.85.85 0 001.7 0V19.6zm-3.35-4.75a.85.85 0 00-1.7 0v6.3a.85.85 0 001.7 0v-6.3z" fill="#0099FF"></path></svg>
+            </label>
+            <input style="flex: 1 1 auto" id="my-input" type="text" placeholder="Message..." autocomplete="off" />
+            <span onclick="get_message();" class="d-flex justify-content-center" style="flex: 0 1 50px" data-bs-toggle="tooltip" data-bs-placement="top" title="Send">
+              <i class="fa fa-paper-plane"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+      
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="currentUserInfo" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasExampleLabel">Profile</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <img class="profile-picture"></img>
+          <br>
+          <b>Email: </b><span id="profile-email"></span>
+          <br>
+          <b>Id: </b><span id="profile-id"></span>
+        </div>
+      </div>
+
+
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="chatUserInfo" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasExampleLabel">Chat info</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <img id="chat-picture"></img>
+          <br>
+          <b>Email: </b><span id="chat-email">Select an user to start chatting</span>
+          <br>
+          <b>Id: </b><span id="chat-id">No user selected yet</span>
+        </div>
+      </div>
+
+    </template>
+
+    <div id="app"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/emojionearea/3.4.2/emojionearea.min.js" integrity="sha512-hkvXFLlESjeYENO4CNi69z3A1puvONQV5Uh+G4TUDayZxSLyic5Kba9hhuiNLbHqdnKNMk2PxXKm0v7KDnWkYA==" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+    <script src="./js/index.js" defer></script>
+    <script src="./js/component.js" defer></script>
+    <script src="./js/sample.js" defer></script>
+    <script src="./js/model.js" defer></script>
+    <script src="./js/controller.js" defer></script>
+    <script src="./js/landing.js" defer></script>
+    <script src="./js/chat.js" defer></script>
+    <script src="./js/rendering.js" defer></script>
+    <script src="./js/view.js" defer></script>
+  </body>
+</html>

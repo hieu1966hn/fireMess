@@ -1,0 +1,101 @@
+.person {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.person:hover {
+  background-color: #f5f5f5;
+}
+
+.person-focus {
+  background-color: #f2f2f2;
+}
+
+.person-focus:hover {
+  background-color: #f1f1f1;
+}
+
+.person p {
+  color: gray;
+}
+
+.message-left p {
+  background-color: #ecebec;
+  border-radius: 10px;
+  color: black;
+}
+
+.message-left .msg-container {
+  position: relative;
+  transform-origin: 0 100%;
+}
+
+.message-left .msg-container::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-left: 10px solid transparent;
+  border-right: 10px solid #ecebec;
+  border-bottom: 10px solid #ecebec;
+}
+
+.message-left img {
+  margin-right: auto;
+  margin-left: 0;
+  transform-origin: 0 100%;
+  max-width: 60%;
+}
+
+.message-right p {
+  color: white;
+  background-color: #0099ff;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.message-right .msg-container {
+  margin-left: auto;
+  margin-right: 0;
+  transform-origin: 100% 100%;
+  position: relative;
+}
+
+.message-right .msg-container::before {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-left: 10px solid #0099ff;
+  border-bottom: 10px solid #0099ff;
+}
+
+.message-right img {
+  margin-left: auto;
+  margin-right: 0;
+  transform-origin: 100% 100%;
+  max-width: 60%;
+}
+
+#right-panel i {
+  font-size: 20px;
+  color: #0099ff;
+}
+
+@media only screen and (max-width: 768px) {
+  .message-left img {
+    max-width: 100%;
+  }
+
+  .message-right img{
+    max-width: 100%;
+  }
+}
