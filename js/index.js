@@ -2,13 +2,14 @@ let auth, database;
 
 const init = function () {
   var firebaseConfig = {
-    apiKey: "AIzaSyC0YRgwb33eKMgCH4uE1ChOt9NjzNcpn24",
-    authDomain: "firemess-2ccd2.firebaseapp.com",
-    projectId: "firemess-2ccd2",
-    storageBucket: "firemess-2ccd2.appspot.com",
-    messagingSenderId: "198328051551",
-    appId: "1:198328051551:web:d39551bf699163a115b8ea",
+    apiKey: "AIzaSyDco_mHLZX61GSTIohHJLB3yW-rP-qZKjw",
+    authDomain: "hdt-jsao5.firebaseapp.com",
+    projectId: "hdt-jsao5",
+    storageBucket: "hdt-jsao5.appspot.com",
+    messagingSenderId: "1012506478897",
+    appId: "1:1012506478897:web:2c32a3f4126a5d83e58810"
   };
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
   database = firebase.database();
