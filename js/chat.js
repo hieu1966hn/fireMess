@@ -1,11 +1,12 @@
-let chatUser = undefined;
+let chatUser;
 let newItems = {};
 let main_chat;
 let loading = false;
+let firstClick = false;
 
 function init_chat() {
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 
@@ -17,22 +18,14 @@ function init_chat() {
 
   let my_input = $("#my-input").emojioneArea();
   my_input[0].emojioneArea.on("keydown", function (btn, event) {
-    if (event.keyCode == 13) {
+    if (event.keyCode === 13) {
       get_message();
     }
   });
 
+  document.getElementById("right-panel").style.display = "none";
+
   main_chat = document.getElementById("main-chat");
-
-  main_chat.innerHTML = sample.carousel();
-  document.getElementById("chat-user-info").innerHTML = sample.chatUser("https://i.imgur.com/CDqQHpR.jpg", "Select an user to start chatting");
-  let input_box = document.getElementById("input-box").getElementsByTagName("input");
-  for (let i = 0; i < input_box.length; i++) {
-    if(input_box[i].id != "my-input")
-    input_box[i].disabled = true;
-  }
-  document.getElementById("my-input").emojioneArea.disable();
-
 
   let profile_picture_el = document.getElementsByClassName("profile-picture");
   for (let i = 0; i < profile_picture_el.length; i++) {
@@ -40,21 +33,24 @@ function init_chat() {
   }
   document.getElementById("profile-email").innerText = auth.currentUser.email;
   document.getElementById("profile-id").innerText = auth.currentUser.uid;
+  document.getElementById("profile-name").innerText = auth.currentUser.displayName;
 
   database.ref("users").on("child_added", (snapshot) => {
     let user = snapshot.val();
     if (snapshot.key != auth.currentUser.uid) {
-      document.getElementById("people").innerHTML += sample.person(snapshot.key, user["photoURL"], user["displayName"]);
+      if (document.getElementById("people").innerHTML === sample.noUserToChat()) document.getElementById("people").innerHTML = "";
+      document.getElementById("people").innerHTML += sample.person(snapshot.key, user.photoURL, user.displayName);
 
       database
         .ref("messages")
         .child(arrange_user_id(auth.currentUser.uid, snapshot.key))
         .limitToLast(1)
         .on("child_added", (data) => {
-          document.getElementById(snapshot.key).getElementsByClassName("recent-content")[0].innerText = data.val().type == "image" ? "Image" : data.val().content;
+          document.getElementById(snapshot.key).getElementsByClassName("recent-content")[0].innerText = data.val().type === "image" ? "Image" : data.val().content;
           if (!newItems[arrange_user_id(auth.currentUser.uid, snapshot.key)]) return;
-          render_message(data.val().sender, snapshot.key, data.val().content, data.val().type);
+          render_message(data.val(), data.key, snapshot.key);
           scroll_bottom();
+          messages_tooltip();
         });
 
       database
@@ -64,10 +60,19 @@ function init_chat() {
           newItems[arrange_user_id(auth.currentUser.uid, snapshot.key)] = true;
         });
     }
+
+    if (!firstClick) {
+      if (document.getElementsByClassName("person")[0]) {
+        document.getElementsByClassName("person")[0].click();
+        firstClick = true;
+      } else {
+        document.getElementById("people").innerHTML = sample.noUserToChat();
+      }
+    }
   });
 
   main_chat.addEventListener("scroll", () => {
-    if (main_chat.scrollTop == 0 && main_chat.scrollHeight > main_chat.clientHeight && !loading) {
+    if (main_chat.scrollTop === 0 && main_chat.scrollHeight > main_chat.clientHeight && !loading) {
       load_previous_messages();
     }
   });
@@ -82,11 +87,17 @@ function get_message() {
     if (!document.getElementsByClassName("emojionearea-picker")[0].classList.contains("hidden")) {
       document.getElementsByClassName("emojionearea-button-close")[0].click();
     }
-    database.ref("messages").child(arrange_user_id(auth.currentUser.uid, chatUser.id)).push({
-      sender: auth.currentUser.uid,
-      content: msg_content,
-      type: "text",
-    });
+    database
+      .ref("messages")
+      .child(arrange_user_id(auth.currentUser.uid, chatUser.id))
+      .push({
+        server_timestamp: {
+          ".sv": "timestamp",
+        },
+        sender: auth.currentUser.uid,
+        content: msg_content,
+        type: "text",
+      });
   }
 }
 
@@ -98,12 +109,18 @@ function readImageFile(el, type) {
     function () {
       if (file.size > 3145728) {
         alert("File is too big!!!");
-      } else if (type.includes(file["type"])) {
-        database.ref("messages").child(arrange_user_id(auth.currentUser.uid, chatUser.id)).push({
-          sender: auth.currentUser.uid,
-          content: reader.result,
-          type: "image",
-        });
+      } else if (type.includes(file.type)) {
+        database
+          .ref("messages")
+          .child(arrange_user_id(auth.currentUser.uid, chatUser.id))
+          .push({
+            server_timestamp: {
+              ".sv": "timestamp",
+            },
+            sender: auth.currentUser.uid,
+            content: reader.result,
+            type: "image",
+          });
       }
     },
     false
@@ -111,5 +128,34 @@ function readImageFile(el, type) {
 
   if (file) {
     reader.readAsDataURL(file);
+  }
+}
+
+function remove_message(key) {
+  database.ref("messages").child(arrange_user_id(auth.currentUser.uid, chatUser.id)).child(key).remove();
+}
+
+async function copy_to_clipboard(key) {
+  if (document.getElementById(key).getElementsByClassName("message-content")[0]) {
+    let text = document.getElementById(key).getElementsByClassName("message-content")[0].innerText;
+    await navigator.clipboard.writeText(text);
+  } else {
+    const src = document.getElementById(key).getElementsByTagName("img")[0].src;
+    let myImage = document.createElement("img");
+    myImage.src = src;
+    let myCanvas = document.createElement("canvas");
+    myCanvas.width = myImage.width;
+    myCanvas.height = myImage.height;
+    let ctx = myCanvas.getContext("2d");
+    ctx.drawImage(myImage, 0, 0);
+
+    const newSrc = await myCanvas.toDataURL();
+    const res = await fetch(newSrc);
+    const blob = await res.blob();
+    navigator.clipboard.write([
+      new ClipboardItem({
+        "image/png": blob,
+      }),
+    ]);
   }
 }
